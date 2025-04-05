@@ -1,0 +1,72 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+vendor/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Generated files
+*.generated.*
+*.g.dart
+*.freezed.dart
+*.pb.rs
+*.pbjson.dart
+
+# Docker
+.docker/
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+
+# Documentation
+/doc/
+/docs/_build/
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+.cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 

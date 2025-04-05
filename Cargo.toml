@@ -1,0 +1,63 @@
+[workspace]
+members = [
+    "apps/api-gateway",
+    "apps/auth-service",
+    "apps/user-service",
+    "apps/product-service",
+    "apps/rental-service",
+    "apps/payment-service",
+    "apps/messaging-service",
+    "apps/notification-service",
+    "apps/search-service",
+    "libs/common",
+    "libs/models",
+    "libs/proto"
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["OneSociety Team"]
+repository = "https://github.com/yourusername/onesociety"
+
+[workspace.dependencies]
+# Core dependencies
+tokio = { version = "1.28", features = ["full"] }
+axum = "0.6"
+tonic = "0.9"
+prost = "0.11"
+sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "time", "json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Authentication & Authorization
+jsonwebtoken = "8.3"
+argon2 = "0.5"
+
+# Logging & Monitoring
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+prometheus = "0.13"
+
+# Error Handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Utilities
+uuid = { version = "1.3", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+async-trait = "0.1"
+
+# Testing
+mockall = "0.11"
+fake = { version = "2.6", features = ["uuid", "chrono"] }
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+codegen-units = 1 

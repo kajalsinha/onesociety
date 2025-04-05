@@ -1,0 +1,14 @@
+{
+  "rust_backend": {
+    "file_patterns": ["backend/**/*.rs"],
+    "rules": [
+      "Use `sqlx` for PostgreSQL queries with compile-time verification",
+      "Enforce error handling with `thiserror` or `anyhow`",
+      "Apply REST API conventions with `axum` or `actix-web`",
+      "Structure endpoints as: `/api/v1/resource`",
+      "Use `serde` for JSON serialization",
+      "Enable `clippy` lints in Cargo.toml",
+      "Logging via `tracing` or `log` crate"
+    ]
+  }
+} 

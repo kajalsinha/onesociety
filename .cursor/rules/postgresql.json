@@ -1,0 +1,14 @@
+{
+  "postgresql": {
+    "file_patterns": ["backend/migrations/*.sql", "backend/src/db/*.rs"],
+    "rules": [
+      "Use snake_case for table/column names",
+      "Add comments to tables/columns via SQL",
+      "Enable Row-Level Security (RLS) where applicable",
+      "Foreign keys with `ON DELETE CASCADE`",
+      "Index frequently queried columns",
+      "Use `uuid-ossp` for primary keys",
+      "Avoid `SELECT *` in queries"
+    ]
+  }
+} 

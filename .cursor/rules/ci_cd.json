@@ -1,0 +1,11 @@
+{
+  "ci_cd": {
+    "description": "Automated checks for commits/PRs",
+    "rules": [
+      "Rust: Run `cargo clippy --all-targets -- -D warnings`",
+      "Dart: Enforce `flutter analyze`",
+      "PostgreSQL: Test migrations via `sqlx migrate verify`",
+      "Format code with `dart format` and `cargo fmt`"
+    ]
+  }
+} 

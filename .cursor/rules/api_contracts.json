@@ -1,0 +1,12 @@
+{
+  "api_contracts": {
+    "description": "Ensure consistent API communication",
+    "rules": [
+      "Use OpenAPI 3.0 specs for Rust backend",
+      "Generate Dart models from OpenAPI via `openapi-generator`",
+      "All API responses wrapped in: `{ data: T, error: string | null }`",
+      "HTTP status codes: 200 (success), 400 (client error), 500 (server error)",
+      "Version APIs via URL path (`/api/v1/...`)"
+    ]
+  }
+} 

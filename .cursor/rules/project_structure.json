@@ -1,0 +1,12 @@
+{
+  "project_structure": {
+    "description": "Enforce clean architecture with clear separation of backend (Rust) and frontend (Flutter)",
+    "rules": [
+      "backend/ for Rust services (API, database)",
+      "frontend/ for Flutter/Dart UI code",
+      "shared/ for cross-platform models and utilities",
+      "Use Cargo workspaces for Rust modules",
+      "Follow Flutter's layered architecture (presentation/domain/data)"
+    ]
+  }
+} 

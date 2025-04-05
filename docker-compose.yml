@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  # Infrastructure Services
+  postgres:
+    image: postgis/postgis:15-3.3
+    environment:
+      POSTGRES_USER: onesociety
+      POSTGRES_PASSWORD: development_password
+      POSTGRES_DB: onesociety
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  elasticsearch:
+    image: elasticsearch:8.7.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    volumes:
+      - ./config/development/prometheus:/etc/prometheus
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:9.5.2
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+
+  # Application Services
+  api_gateway:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.gateway
+    depends_on:
+      - auth_service
+    ports:
+      - "8000:8000"
+    environment:
+      - RUST_LOG=debug
+
+  auth_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: auth-service
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - RUST_LOG=debug
+      - DATABASE_URL=postgresql://onesociety:development_password@postgres:5432/onesociety
+      - REDIS_URL=redis://redis:6379
+
+  user_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: user-service
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - RUST_LOG=debug
+      - DATABASE_URL=postgresql://onesociety:development_password@postgres:5432/onesociety
+      - REDIS_URL=redis://redis:6379
+
+  product_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: product-service
+    depends_on:
+      - postgres
+      - elasticsearch
+    environment:
+      - RUST_LOG=debug
+      - DATABASE_URL=postgresql://onesociety:development_password@postgres:5432/onesociety
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+
+  rental_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: rental-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - RUST_LOG=debug
+      - DATABASE_URL=postgresql://onesociety:development_password@postgres:5432/onesociety
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+
+  payment_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: payment-service
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - RUST_LOG=debug
+      - DATABASE_URL=postgresql://onesociety:development_password@postgres:5432/onesociety
+      - REDIS_URL=redis://redis:6379
+
+  messaging_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: messaging-service
+    depends_on:
+      - redis
+      - rabbitmq
+    environment:
+      - RUST_LOG=debug
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+
+  notification_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: notification-service
+    depends_on:
+      - redis
+      - rabbitmq
+    environment:
+      - RUST_LOG=debug
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+
+  search_service:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.service
+      args:
+        SERVICE_NAME: search-service
+    depends_on:
+      - elasticsearch
+    environment:
+      - RUST_LOG=debug
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+
+volumes:
+  postgres_data: 

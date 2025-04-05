@@ -1,0 +1,14 @@
+{
+  "flutter_frontend": {
+    "file_patterns": ["frontend/**/*.dart"],
+    "rules": [
+      "Use `riverpod` for state management",
+      "Follow BLoC pattern for complex logic",
+      "Enforce null safety (Dart 2.12+)",
+      "Group widgets by feature (screens/widgets/models)",
+      "API calls via `dio` with typed responses",
+      "JSON serialization with `json_serializable`",
+      "Error handling with `try/catch` and `Result` pattern"
+    ]
+  }
+} 

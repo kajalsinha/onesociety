@@ -1,0 +1,12 @@
+{
+  "testing": {
+    "file_patterns": ["**/test/*.rs", "**/test/*.dart"],
+    "rules": [
+      "Rust: Unit tests in `mod tests` with `#[cfg(test)]`",
+      "Flutter: Use `mocktail` for mocking",
+      "Test CRUD operations for all PostgreSQL tables",
+      "Golden tests for Flutter widgets",
+      "Integration tests for API endpoints"
+    ]
+  }
+} 

@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- Follow rules as per context defined in the following json files
+
+[api_contracts.json](mdc:.cursor/rules/api_contracts.json)
+[ci_cd.json](mdc:.cursor/rules/ci_cd.json)
+[flutter_frontend.json](mdc:.cursor/rules/flutter_frontend.json)
+[postgresql.json](mdc:.cursor/rules/postgresql.json)
+[project_structure.json](mdc:.cursor/rules/project_structure.json)
+[rust_backend.json](mdc:.cursor/rules/rust_backend.json)
+[testing.json](mdc:.cursor/rules/testing.json)
