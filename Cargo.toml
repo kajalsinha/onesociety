@@ -24,7 +24,7 @@ repository = "https://github.com/yourusername/onesociety"
 [workspace.dependencies]
 # Core dependencies
 tokio = { version = "1.28", features = ["full"] }
-axum = "0.6"
+axum = "0.8"
 tonic = "0.9"
 prost = "0.11"
 sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "time", "json"] }
