@@ -1,0 +1,11 @@
+[[bin]]
+name = "api-gateway"
+path = "src/main.rs"
+
+[package]
+name = "api-gateway"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+

@@ -89,7 +89,7 @@ This app facilitates a peer-to-peer rental marketplace where individuals can ren
 - Database management with PostgreSQL or MongoDB.
 
 #### **Frontend Development**
-- Intuitive UI/UX design using React Native or Flutter for cross-platform compatibility.
+- Intuitive UI/UX design using Flutter for cross-platform compatibility.
 
 #### **API Integrations**
 - APIs for payment gateways, geolocation services, messaging platforms, insurance providers, and CRM systems[5][9].

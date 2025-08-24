@@ -1,4 +1,4 @@
-.PHONY: setup dev test build clean proto lint format help db-setup db-migrate db-rollback db-status db-validate db-validate-full db-docker-setup db-docker-teardown db-docker-restart db-docker-status db-docker-reset
+.PHONY: setup dev test build clean proto lint format help db-setup db-migrate db-rollback db-status db-validate db-validate-full db-docker-setup db-docker-teardown db-docker-restart db-docker-status db-docker-reset monolith-run
 
 # Default target
 .DEFAULT_GOAL := help
@@ -42,6 +42,14 @@ test: ## Run all tests
 	@echo "Running tests..."
 	$(CARGO) test --workspace
 	cd apps/mobile-app && $(FLUTTER) test
+
+monolith-run: ## Run the monolith server locally (requires DATABASE_URL)
+	@if [ "$$DATABASE_URL" = "" ]; then \
+		echo "Error: DATABASE_URL is not set. Example: export DATABASE_URL=postgresql://onesociety:development_password@localhost:5432/onesociety"; \
+		exit 1; \
+	fi
+	@echo "Running monolith server..."
+	cd apps/monolith-server && RUST_LOG=info $(CARGO) run
 
 proto: ## Generate Protocol Buffer code
 	@echo "Generating Protocol Buffer code..."

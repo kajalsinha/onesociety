@@ -15,3 +15,10 @@ alwaysApply: true
 [project_structure.json](mdc:.cursor/rules/project_structure.json)
 [rust_backend.json](mdc:.cursor/rules/rust_backend.json)
 [testing.json](mdc:.cursor/rules/testing.json)
+
+The project uses a single PostgreSQL database for all services, a single monolithic backend app (with potential to split into microservices later), and Flutter for the front end.
+
+
+all project planning and task update must be done and tracked from within `project/plan` and `project/tasks` 
+
+no source code should be > 500 lines of code (excluding imports, code comments and inline tests), if it exceeds the code file should be refactored on first chance according to SOLID  principles.

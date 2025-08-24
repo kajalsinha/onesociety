@@ -33,13 +33,13 @@ VALUES
     ('hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh', 'new');
 
 -- Insert subscription plans
-INSERT INTO subscription_schema.plans (plan_id, name, description, price, currency, billing_interval, features)
+INSERT INTO subscription_schema.subscription_plans (id, name, description, price_cents, currency, billing_cycle, features, max_listings, max_rentals_per_month, priority_support)
 VALUES
-    ('iiiiiiii-iiii-iiii-iiii-iiiiiiiiiiii', 'Basic', 'Basic subscription plan', 9.99, 'EUR', 'monthly',
-     '{"max_listings": 10, "featured_listings": 0}'::jsonb),
-    ('jjjjjjjj-jjjj-jjjj-jjjj-jjjjjjjjjjjj', 'Premium', 'Premium subscription plan', 19.99, 'EUR', 'monthly',
-     '{"max_listings": 50, "featured_listings": 5}'::jsonb),
-    ('kkkkkkkk-kkkk-kkkk-kkkk-kkkkkkkkkkkk', 'Professional', 'Professional subscription plan', 49.99, 'EUR', 'monthly',
-     '{"max_listings": -1, "featured_listings": 20}'::jsonb);
+    ('iiiiiiii-iiii-iiii-iiii-iiiiiiiiiiii', 'Basic', 'Basic subscription plan for casual users', 999, 'USD', 'monthly',
+     '["basic_support", "standard_listings"]'::jsonb, 10, 5, false),
+    ('jjjjjjjj-jjjj-jjjj-jjjj-jjjjjjjjjjjj', 'Premium', 'Premium subscription plan for active users', 1999, 'USD', 'monthly',
+     '["priority_support", "featured_listings", "analytics"]'::jsonb, 50, 20, true),
+    ('kkkkkkkk-kkkk-kkkk-kkkk-kkkkkkkkkkkk', 'Professional', 'Professional subscription plan for power users', 4999, 'USD', 'monthly',
+     '["dedicated_support", "unlimited_listings", "advanced_analytics", "api_access"]'::jsonb, null, null, true);
 
 COMMIT; 

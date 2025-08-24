@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "apps/monolith-server",
     "apps/api-gateway",
     "apps/auth-service",
     "apps/user-service",
