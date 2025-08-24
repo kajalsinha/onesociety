@@ -41,7 +41,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 prometheus = "0.13"
 
 # Error Handling
-thiserror = "1.0"
+thiserror = "2.0"
 anyhow = "1.0"
 
 # Utilities
