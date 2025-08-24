@@ -15,7 +15,7 @@ anyhow = "1"
 sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "time", "json"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
-jsonwebtoken = "8.3"
+jsonwebtoken = "9.3"
 argon2 = "0.5"
 bcrypt = "0.15"
 
