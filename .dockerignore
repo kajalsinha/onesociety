@@ -1,0 +1,66 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+docs/
+*.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rust
+target/
+Cargo.lock
+**/target/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test files
+tests/
+**/tests/
+
+# Temporary files
+tmp/
+temp/
+
+# Database
+*.db
+*.sqlite
+
+# Node.js (if any frontend build artifacts)
+node_modules/
+npm-debug.log*
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Coverage reports
+coverage/
+*.profraw
+
+# Profiling
+*.prof

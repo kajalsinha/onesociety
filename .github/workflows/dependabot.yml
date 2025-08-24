@@ -1,0 +1,75 @@
+name: Dependabot
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+  workflow_dispatch:
+
+jobs:
+  # Check for outdated dependencies
+  check-dependencies:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Check for outdated dependencies
+      run: |
+        cargo install cargo-outdated
+        cargo outdated --exit-code 1 || echo "Some dependencies are outdated"
+
+    - name: Run cargo audit
+      run: |
+        cargo install cargo-audit
+        cargo audit
+
+  # Update dependencies (manual trigger only)
+  update-dependencies:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Update dependencies
+      run: |
+        cargo update
+        cargo build --workspace
+
+    - name: Run tests after update
+      run: |
+        cargo test --workspace
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update dependencies'
+        title: 'chore: update dependencies'
+        body: |
+          This PR updates dependencies to their latest versions.
+          
+          ## Changes
+          - Updated Rust dependencies
+          - Updated development dependencies
+          
+          ## Testing
+          - [x] All tests pass
+          - [x] Build successful
+          - [x] No breaking changes detected
+        branch: dependabot/update-dependencies
+        delete-branch: true

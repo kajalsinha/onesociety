@@ -1,0 +1,172 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'apps/mobile-app/**'
+      - '.github/workflows/flutter.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'apps/mobile-app/**'
+
+jobs:
+  # Flutter testing and analysis
+  flutter-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: |
+        cd apps/mobile-app
+        flutter pub get
+
+    - name: Analyze code
+      run: |
+        cd apps/mobile-app
+        flutter analyze
+
+    - name: Run tests
+      run: |
+        cd apps/mobile-app
+        flutter test
+
+    - name: Run integration tests
+      run: |
+        cd apps/mobile-app
+        flutter test integration_test/
+      continue-on-error: true
+
+  # Build Android APK
+  build-android:
+    runs-on: ubuntu-latest
+    needs: flutter-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Get dependencies
+      run: |
+        cd apps/mobile-app
+        flutter pub get
+
+    - name: Build APK
+      run: |
+        cd apps/mobile-app
+        flutter build apk --release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release
+        path: apps/mobile-app/build/app/outputs/flutter-apk/app-release.apk
+
+  # Build iOS (macOS only)
+  build-ios:
+    runs-on: macos-latest
+    needs: flutter-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: |
+        cd apps/mobile-app
+        flutter pub get
+
+    - name: Build iOS
+      run: |
+        cd apps/mobile-app
+        flutter build ios --release --no-codesign
+
+    - name: Upload iOS build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ios-build
+        path: apps/mobile-app/build/ios/
+
+  # Code coverage
+  coverage:
+    runs-on: ubuntu-latest
+    needs: flutter-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: |
+        cd apps/mobile-app
+        flutter pub get
+
+    - name: Run tests with coverage
+      run: |
+        cd apps/mobile-app
+        flutter test --coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: apps/mobile-app/coverage/lcov.info
+        flags: flutter
+        name: flutter-coverage
+
+  # Deploy to Firebase App Distribution (optional)
+  deploy-firebase:
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download APK artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: app-release
+
+    - name: Deploy to Firebase App Distribution
+      uses: wzieba/Firebase-Distribution-Github-Action@v1
+      with:
+        appId: ${{ secrets.FIREBASE_APP_ID }}
+        serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        groups: testers
+        file: app-release.apk
+        releaseNotes: ${{ github.event.head_commit.message }}

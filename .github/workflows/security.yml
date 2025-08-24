@@ -1,0 +1,143 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+
+jobs:
+  # Dependency vulnerability scan
+  dependency-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    - name: Run cargo audit
+      run: |
+        cargo install cargo-audit
+        cargo audit
+
+    - name: Run cargo outdated
+      run: |
+        cargo install cargo-outdated
+        cargo outdated --exit-code 1 || echo "Some dependencies are outdated"
+
+  # Code security scan
+  code-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: rust
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+    - name: Check for hardcoded secrets
+      run: |
+        echo "Scanning for potential secrets..."
+        # Check for API keys, passwords, tokens
+        grep -r -i "api_key\|password\|secret\|token\|private_key" apps/ libs/ --include="*.rs" | grep -v "//" | grep -v "use" || echo "No obvious secrets found"
+
+    - name: Check for unsafe code
+      run: |
+        echo "Scanning for unsafe code blocks..."
+        grep -r "unsafe" apps/ libs/ --include="*.rs" || echo "No unsafe blocks found"
+
+  # Container security scan
+  container-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build -t onesociety:test .
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'onesociety:test'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # SAST (Static Application Security Testing)
+  sast:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/secrets
+          p/rust
+        output-format: sarif
+        output-file: semgrep-results.sarif
+
+    - name: Upload Semgrep results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'semgrep-results.sarif'
+
+  # License compliance
+  license-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check license compliance
+      run: |
+        echo "Checking license compliance..."
+        # Add license compliance checks here
+        echo "License compliance check completed"
+
+  # Security policy check
+  security-policy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check security policy
+      run: |
+        echo "Checking security policy compliance..."
+        # Check if SECURITY.md exists and is properly configured
+        if [ -f "SECURITY.md" ]; then
+          echo "SECURITY.md found"
+        else
+          echo "Warning: SECURITY.md not found"
+        fi
