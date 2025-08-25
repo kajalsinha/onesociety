@@ -12,6 +12,7 @@ CREATE SCHEMA IF NOT EXISTS audit_schema;
 CREATE SCHEMA IF NOT EXISTS messaging_schema;
 CREATE SCHEMA IF NOT EXISTS review_schema;
 CREATE SCHEMA IF NOT EXISTS subscription_schema;
+CREATE SCHEMA IF NOT EXISTS notification_schema;
 
 -- User Service Tables (PII isolation)
 CREATE TABLE user_schema.users (
@@ -178,6 +179,45 @@ CREATE TABLE subscription_schema.subscriptions (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Notification system
+CREATE TABLE IF NOT EXISTS notification_schema.channels (
+    channel_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS notification_schema.templates (
+    template_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) UNIQUE NOT NULL,
+    channel VARCHAR(50) NOT NULL,
+    subject TEXT,
+    body TEXT,
+    metadata JSONB
+);
+
+CREATE TABLE IF NOT EXISTS notification_schema.user_settings (
+    user_id UUID PRIMARY KEY REFERENCES user_schema.users(user_id) ON DELETE CASCADE,
+    preferences JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS notification_schema.notifications (
+    notification_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES user_schema.users(user_id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    category VARCHAR(50),
+    data JSONB,
+    is_read BOOLEAN DEFAULT false,
+    sent_via JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    read_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notification_schema.notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notification_schema.notifications(is_read);
 
 -- Audit Service Tables
 CREATE TABLE audit_schema.audit_logs (

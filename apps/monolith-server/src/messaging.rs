@@ -135,7 +135,8 @@ pub async fn create_conversation(
     .map_err(|e| (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e))?;
 
     if let Some(conv) = existing_conversation {
-        return err(axum::http::StatusCode::CONFLICT, format!("Conversation already exists: {}", conv.id));
+        let msg = format!("Conversation already exists: {}", conv.id);
+        return err(axum::http::StatusCode::CONFLICT, &msg);
     }
 
     // Create conversation and first message in a transaction

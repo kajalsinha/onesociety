@@ -7,6 +7,8 @@ use routes::auth as auth_routes;
 use routes::health::{healthz, readyz};
 use routes::messaging as messaging_routes;
 use routes::payment as payment_routes;
+use routes::notification as notification_routes;
+use routes::admin as admin_routes;
 use routes::product as product_routes;
 use routes::rental as rental_routes;
 use routes::review as review_routes;
@@ -14,6 +16,12 @@ use routes::subscription as subscription_routes;
 use routes::user as user_routes;
 use state::AppState;
 use tracing_subscriber::EnvFilter;
+use tower_http::trace::TraceLayer;
+
+use crate::observability;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
+mod openapi;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -26,6 +34,7 @@ async fn main() -> anyhow::Result<()> {
 
     let state = AppState { db: pool };
 
+    let openapi = openapi::ApiDoc::openapi();
     let app = Router::new()
         .route("/healthz", get(healthz))
         .route("/readyz", get(readyz))
@@ -37,6 +46,11 @@ async fn main() -> anyhow::Result<()> {
         .nest("/api/v1/messaging", messaging_routes::router())
         .nest("/api/v1/review", review_routes::router())
         .nest("/api/v1/subscription", subscription_routes::router())
+        .nest("/api/v1/notification", notification_routes::router())
+        .nest("/api/v1/admin", admin_routes::router())
+        .nest("/", observability::router())
+        .merge(SwaggerUi::new("/docs").url("/api-docs/openapi.json", openapi))
+        .layer(TraceLayer::new_for_http())
         .with_state(state);
 
     let addr = config.bind_addr.parse()?;
