@@ -22,9 +22,19 @@ pub struct NotificationItem {
 	pub message: String,
 	pub category: Option<String>,
 	pub data: Option<serde_json::Value>,
-	pub is_read: bool,
+	pub is_read: Option<bool>,
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/notification/users/{user_id}/notifications",
+    params(
+        ("user_id" = Uuid, Path, description = "User ID")
+    ),
+    responses(
+        (status = 200, description = "List notifications", body = [NotificationItem])
+    )
+)]
 async fn list_user_notifications(
 	state: axum::extract::State<AppState>,
 	Path(user_id): Path<Uuid>,
@@ -40,6 +50,12 @@ async fn list_user_notifications(
 	ok(items)
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/v1/notification/notifications",
+    request_body = NotificationInput,
+    responses((status = 200, description = "Created notification"))
+)]
 async fn create_notification(
 	state: axum::extract::State<AppState>,
 	Json(input): Json<NotificationInput>,
@@ -61,6 +77,15 @@ async fn create_notification(
 	}
 }
 
+#[utoipa::path(
+    post,
+    path = "/api/v1/notification/users/{user_id}/notifications/{notification_id}/read",
+    params(
+        ("user_id" = Uuid, Path, description = "User ID"),
+        ("notification_id" = Uuid, Path, description = "Notification ID")
+    ),
+    responses((status = 200, description = "Marked as read"))
+)]
 async fn mark_read(
 	state: axum::extract::State<AppState>,
 	Path((user_id, notification_id)): Path<(Uuid, Uuid)>,
