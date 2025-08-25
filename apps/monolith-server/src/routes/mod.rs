@@ -7,3 +7,5 @@ pub mod payment;
 pub mod messaging;
 pub mod review;
 pub mod subscription;
+pub mod notification;
+pub mod admin;

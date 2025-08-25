@@ -8,3 +8,5 @@ pub mod messaging;
 pub mod review;
 pub mod payment;
 pub mod subscription;
+pub mod routes;
+pub mod observability;

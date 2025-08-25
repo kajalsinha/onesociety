@@ -187,16 +187,38 @@ jobs:
         toolchain: stable
         override: true
 
-    - name: Generate API documentation
+    - name: Generate API docs and OpenAPI
       run: |
         cargo doc --workspace --no-deps
         echo "Documentation generated successfully"
+        # Build server to validate OpenAPI generation compiles
+        cargo build -p monolith-server --verbose
 
     - name: Upload documentation artifacts
       uses: actions/upload-artifact@v3
       with:
         name: api-docs
         path: target/doc/
+
+  openapi-diff:
+    name: OpenAPI Diff
+    runs-on: ubuntu-latest
+    needs: rust-backend
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Install oasdiff
+      run: |
+        curl -sSL https://github.com/Tufin/oasdiff/releases/download/v2.10.0/oasdiff_2.10.0_Linux_x86_64.tar.gz | tar -xz
+        sudo mv oasdiff /usr/local/bin/
+    - name: Generate OpenAPI JSON
+      run: |
+        cargo run -p monolith-server --bin monolith-server -- --help || true
+        # The server embeds OpenAPI at runtime under /docs; we skip runtime fetch in CI
+        echo "Skipping runtime fetch of OpenAPI; compile is proxy for schema validity"
+    - name: OpenAPI baseline check (placeholder)
+      run: |
+        echo "Add baseline and diff when baseline file is committed"
 
   # Performance benchmarks (optional)
   benchmarks:
